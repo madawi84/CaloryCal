@@ -6,20 +6,20 @@
 
 ## 📌 Overview
 
-**CaloryCal** is an AI-powered system that estimates the caloric content of food from a single image. The system combines **instance segmentation**, **depth estimation**, and **nutritional modelling** to produce **per-item calorie estimates**, rather than treating the entire plate as a single unit.
+**CaloryCal** is an AI-powered system that estimates the caloric content of food from a single image. The system combines **instance segmentation**, **depth estimation**, and **relative nutritional modelling** to produce **per-item calorie estimates**, rather than treating the entire plate as a single unit.
 
-The project has progressed beyond proof-of-concept and now demonstrates a **complete end-to-end pipeline**, with current limitations primarily related to **data quality and class imbalance**, not model capability.
+The project has progressed beyond proof-of-concept and now demonstrates a **complete end-to-end pipeline**, with current limitations primarily related to **data quality and class imbalance**, not model capability. :contentReference[oaicite:0]{index=0}
 
 ---
 
 ## 🎯 Key Features
 
-* 🍛 **Food Detection & Segmentation** using YOLO segmentation
-* 📏 **Portion Size Estimation** using depth maps
-* ⚖️ **Relative portion-based calorie estimation** using segmentation and depth
-* 🧠 **Data-centric optimisation strategy** (handling long-tail distribution)
-* 📱 **Planned mobile deployment (iPhone-first approach)**
-* 🧩 **Future integration with SAM (Segment Anything Model)** for refinement
+* 🍛 **Food Detection & Segmentation** using YOLO segmentation  
+* 📏 **Portion Size Estimation** using depth maps  
+* ⚖️ **Relative portion-based calorie estimation** using segmentation and depth  
+* 🧠 **Data-centric optimisation strategy** (handling long-tail distribution)  
+* 📱 **Planned mobile deployment (iPhone-first approach)**  
+* 🧩 **Future integration with SAM (Segment Anything Model)** for refinement  
 
 ---
 
@@ -49,11 +49,6 @@ The current system estimates calories using a **relative portion-based approach*
 
 ### Step 1 — Relative Size Score
 
-A size score is computed for each food item using:
-
-- pixel area of the segmentation mask  
-- relative depth statistics (median or mean depth)
-
 ```
 size_score = pixel_area × depth_median
 ```
@@ -61,8 +56,6 @@ size_score = pixel_area × depth_median
 ---
 
 ### Step 2 — Normalisation
-
-The size score is normalised across all detected items:
 
 ```
 size_score_norm = size_score / max(size_score)
@@ -72,8 +65,6 @@ size_score_norm = size_score / max(size_score)
 
 ### Step 3 — Portion Classification
 
-The normalised score is mapped to portion categories:
-
 - small (< 0.33)  
 - medium (< 0.66)  
 - large (≥ 0.66)  
@@ -82,18 +73,16 @@ The normalised score is mapped to portion categories:
 
 ### Step 4 — Calorie Estimation
 
-Each food item is assigned a base calorie value and scaled using the relative portion size:
-
 ```
 portion_scale = 0.5 + size_score_norm
 estimated_calories = base_calories × portion_scale
 ```
+
+---
+
 ### Example Calorie Reference
 
-The system uses a reference dictionary mapping food labels to base calorie values:
-
-```
-python
+```python
 calorie_reference = {
     "rice": 206,
     "bread": 80,
@@ -104,77 +93,96 @@ calorie_reference = {
 }
 ```
 
-Unknown items are assigned a default calorie value.
 ---
 
-### ⚠️ Important
+## 📸 Example Results
 
-This approach provides **relative calorie estimates**, not exact real-world measurements.
+### Segmentation Output
+![Segmentation](results/images/segmentation_result.jpg)
 
-True physical modelling (volume, density, calibrated depth) is planned as future work.
+### Depth Estimation
+![Depth](results/images/depth_map.jpg)
 
+---
 
-## 📊 Current Results
+## 📊 Model Performance
 
 | Metric        | Value |
-| ------------- | ----- |
-| Box mAP50     | 0.376 |
-| Box mAP50–95  | 0.316 |
-| Mask mAP50    | 0.378 |
-| Mask mAP50–95 | 0.301 |
+|-------------|------|
+| Box mAP50    | 0.376 |
+| Box mAP50–95 | 0.316 |
+| Mask mAP50   | 0.378 |
+| Mask mAP50–95| 0.301 |
 
-### 🔍 Interpretation
+**Interpretation:**
+- The model is **functionally stable**
+- Performance is limited by **data quality**, not architecture
+- Segmentation errors directly impact calorie estimation accuracy
 
-* The model is **functionally stable**
-* Performance is limited by **data quality**, not architecture
-* Segmentation errors directly affect calorie estimation
+---
+
+## ⚠️ Current Limitations
+
+The current system uses **relative depth and pixel-based scaling**, not real-world measurements.
+
+As a result:
+- Depth values are not in physical units (cm or mm)
+- Portion estimation is relative within the same image
+- Calorie estimates are scaled approximations, not exact values
+
+This design is intentional at the prototype stage to validate the pipeline before introducing calibrated measurements.
+
+---
+
+## 🧠 Methodological Choice
+
+Instead of directly estimating physical volume, this project adopts a **data-centric relative estimation approach**:
+
+- segmentation quality is prioritised over geometric assumptions  
+- relative depth is used to rank portion sizes  
+- calorie estimation is scaled based on intra-image comparison  
+
+This reduces error propagation from inaccurate depth scaling and improves robustness in uncontrolled real-world conditions.
 
 ---
 
 ## ⚠️ Key Challenges
 
-* Long-tail class distribution (FoodSeg103 dataset)
-* Visually ambiguous categories (e.g., sauces, mixed food)
-* Label noise and segmentation boundary errors
-* Class imbalance affecting rare food detection
+* Long-tail class distribution (FoodSeg103 dataset)  
+* Visually ambiguous categories (e.g., sauces, mixed food)  
+* Label noise and segmentation boundary errors  
+* Class imbalance affecting rare food detection  
 
 ---
 
 ## 🚀 Future Work & Roadmap
 
 ### Phase 1 — Data-Centric Optimisation
-
-* Introduce **On-the-Fly Balanced Sampling**
-* Reduce class space to high-impact food categories
-* Improve annotation quality and dataset coverage
+* Introduce **On-the-Fly Balanced Sampling**  
+* Reduce class space to high-impact food categories  
+* Improve annotation quality and dataset coverage  
 
 ### Phase 2 — Inference Pipeline
-
-* Build lightweight inference module
-* Separate training from deployment
+* Build lightweight inference module  
+* Separate training from deployment  
 
 ### Phase 3 — Mobile Deployment (iPhone First)
-
-* Use **LiDAR / depth APIs**
+* Use **LiDAR / depth APIs**  
 * Enforce controlled capture:
-
-  * Top-down image
-  * Plate alignment zone
-* Improve real-world reliability
+  - top-down image  
+  - plate alignment zone  
+* Improve real-world reliability  
 
 ### Phase 4 — Segmentation Refinement
-
-* Integrate **SAM (Segment Anything Model)**
+* Integrate **SAM (Segment Anything Model)**  
 * Improve:
-
-  * Boundary precision
-  * Overlapping food separation
+  - boundary precision  
+  - overlapping food separation  
 
 ### Phase 5 — System Expansion
-
-* Expand food categories
-* Improve generalisation
-* Replace proxy volume with **true geometric modelling**
+* Expand food categories  
+* Improve generalisation  
+* Replace proxy size estimation with **true geometric modelling**  
 
 ---
 
@@ -183,12 +191,12 @@ True physical modelling (volume, density, calibrated depth) is planned as future
 ```
 CaloryCal/
 │
-├── notebooks/              # Development notebooks            
-├── src/                    # Core pipeline modules
-├── models/                 # Trained weights
-├── data/                   # Sample data & configs
-├── results/                # Outputs & metrics
-├── docs/                   # Proposal & documentation
+├── notebooks/
+├── src/
+├── models/
+├── data/
+├── results/
+├── docs/
 └── README.md
 ```
 
@@ -197,11 +205,8 @@ CaloryCal/
 ## ⚙️ Installation
 
 ```bash
-# Create environment
 python -m venv env
 source env/bin/activate  # or env\Scripts\activate on Windows
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
@@ -212,13 +217,9 @@ pip install -r requirements.txt
 ```python
 from ultralytics import YOLO
 
-# Load model
 model = YOLO("models/best.pt")
+results = model("data/sample_images/test.jpg")
 
-# Run inference
-results = model("data/sample.jpg")
-
-# Visualise masks only
 img = results[0].plot(boxes=False, labels=True, conf=False)
 ```
 
@@ -226,58 +227,47 @@ img = results[0].plot(boxes=False, labels=True, conf=False)
 
 ## 🧪 Technologies Used
 
-* YOLO (Ultralytics) — segmentation
-* Depth Anything V2 — depth estimation
-* Python / PyTorch
-* FoodSeg103 dataset
+* YOLO (Ultralytics) — segmentation  
+* Depth Anything V2 — depth estimation  
+* Python / PyTorch  
+* FoodSeg103 dataset  
 
 ---
 
 ## 📖 Documentation
 
-* Full proposal available in `/docs`
-* Includes:
-
-  * System architecture
-  * Experimental results
-  * Data-centric strategy
-  * Implementation roadmap
+Full proposal available in `/docs`, including:
+- system architecture  
+- experimental results  
+- data-centric strategy  
+- implementation roadmap  
 
 ---
 
 ## 💡 Research Contribution
 
-CaloryCal demonstrates that:
+> **The main bottleneck of the system is not model architecture, but data quality, class imbalance, and label consistency, making this a fundamentally data-centric computer vision problem.**
 
-> **The main bottleneck in food calorie estimation is not model complexity, but data quality and structure.**
-
-The project adopts a **data-centric AI approach**, prioritising:
-
-* Class balance
-* Label quality
-* Real-world deployment constraints
+CaloryCal demonstrates that effective food calorie estimation depends more on **data structure and representation** than on increasing model complexity.
 
 ---
 
 ## 🧭 Future Vision
 
-* Real-time mobile calorie estimation
-* Integration with nutrition APIs (e.g., USDA)
-* Personalised dietary tracking
-* Clinical and healthcare applications
+* Real-time mobile calorie estimation  
+* Integration with nutrition APIs (e.g., USDA)  
+* Personalised dietary tracking  
+* Clinical and healthcare applications  
 
 ---
 
 ## 👤 Author
 
-**Madawi Alsoyohi**
-Data Scientist | Data Scientist
+**Madawi Alsoyohi**  
+Data Scientist  
 
 ---
 
 ## ⭐ Final Note
 
-This project is an evolving system designed to bridge **computer vision** and **nutritional intelligence**.
-It is currently transitioning from a research prototype to a **deployable real-world solution**.
-
----
+This project bridges **computer vision** and **nutritional intelligence**, transitioning from a research prototype into a **deployable real-world system**.
