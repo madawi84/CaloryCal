@@ -133,8 +133,7 @@ food_db = {
 ```
 CaloryCal/
 │
-├── notebooks/              # Development notebooks
-│    └──CaloryCal_pipeline.ipynb             
+├── notebooks/              # Development notebooks            
 ├── src/                    # Core pipeline modules
 ├── models/                 # Trained weights
 ├── data/                   # Sample data & configs
@@ -142,25 +141,6 @@ CaloryCal/
 ├── docs/                   # Proposal & documentation
 └── README.md
 ```
-
----
-## notebooks/
-
-This directory contains the primary Google Colab notebook used during development of the MeyarCal prototype.
-
-### Main notebook
-- `CaloryCal_pipeline.ipynb`
-
-### Purpose
-The notebook was used to:
-- prepare and inspect the dataset
-- train and evaluate the YOLO segmentation model
-- test depth estimation integration
-- calculate intermediate food measurements
-- prototype the calorie estimation workflow
-- visualise outputs and validate the end-to-end pipeline
-
-This notebook represents the experimental foundation of the project before conversion into a more modular codebase.
 
 ---
 
