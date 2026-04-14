@@ -1,0 +1,7 @@
+label,confidence,pixel_area,depth_median,size_score_norm,portion_estimate,base_calories,portion_scale,estimated_calories
+rice,0.9705,31781,3.7913,0.1713,small,206.0,0.67,138.3
+French beans,0.9375,20287,5.1985,0.1499,small,100.0,0.65,65.0
+dried cranberries,0.927,9915,7.2968,0.1028,small,100.0,0.6,60.3
+shrimp,0.8849,13583,3.73,0.072,small,99.0,0.57,56.6
+dried cranberries,0.9014,1775,6.8617,0.0173,small,100.0,0.52,51.7
+carrot,0.9453,98815,7.12,1.0,large,25.0,1.5,37.5

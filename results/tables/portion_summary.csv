@@ -1,0 +1,7 @@
+item_index,label,confidence,pixel_area,depth_mean,depth_median,depth_range,size_score,size_score_norm,portion_estimate
+1,carrot,0.9453,98815,7.1222,7.12,8.0107,703565.6158,1.0,large
+0,rice,0.9705,31781,3.7032,3.7913,2.9881,120491.6102,0.1713,small
+2,French beans,0.9375,20287,5.0503,5.1985,3.7233,105461.6921,0.1499,small
+3,dried cranberries,0.927,9915,7.411,7.2968,3.8715,72347.2817,0.1028,small
+5,shrimp,0.8849,13583,3.6776,3.73,2.2708,50665.1473,0.072,small
+4,dried cranberries,0.9014,1775,6.9051,6.8617,2.8223,12179.5049,0.0173,small
