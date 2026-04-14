@@ -16,7 +16,7 @@ The project has progressed beyond proof-of-concept and now demonstrates a **comp
 
 * 🍛 **Food Detection & Segmentation** using YOLO segmentation
 * 📏 **Portion Size Estimation** using depth maps
-* ⚖️ **Volume → Mass → Calories conversion pipeline**
+* ⚖️ **Relative portion-based calorie estimation** using segmentation and depth
 * 🧠 **Data-centric optimisation strategy** (handling long-tail distribution)
 * 📱 **Planned mobile deployment (iPhone-first approach)**
 * 🧩 **Future integration with SAM (Segment Anything Model)** for refinement
@@ -32,37 +32,86 @@ Food Segmentation (YOLO)
      ↓
 Depth Estimation (Depth Anything V2)
      ↓
-Mask Area + Depth Extraction
+Mask Area + Depth Statistics Extraction
      ↓
-Volume Estimation (L × W × D)
+Relative Portion Estimation (Size Score)
      ↓
-Mass Calculation (Volume × Density)
+Normalisation & Portion Classification (small / medium / large)
      ↓
-Calories (Mass × Calories per gram)
+Calorie Estimation (Base Calories × Portion Scale)
 ```
 
 ---
 
 ## 🧮 Calorie Estimation Model
 
-The system estimates calories using a physically interpretable pipeline:
+The current system estimates calories using a **relative portion-based approach**, rather than true physical volume.
 
-* **Volume** = L × W × D
-* **Mass (g)** = Volume × Density
-* **Calories** = Mass × Calories per gram
+### Step 1 — Relative Size Score
 
-A reference dictionary is used:
+A size score is computed for each food item using:
+
+- pixel area of the segmentation mask  
+- relative depth statistics (median or mean depth)
+
+```
+size_score = pixel_area × depth_median
+```
+
+---
+
+### Step 2 — Normalisation
+
+The size score is normalised across all detected items:
+
+```
+size_score_norm = size_score / max(size_score)
+```
+
+---
+
+### Step 3 — Portion Classification
+
+The normalised score is mapped to portion categories:
+
+- small (< 0.33)  
+- medium (< 0.66)  
+- large (≥ 0.66)  
+
+---
+
+### Step 4 — Calorie Estimation
+
+Each food item is assigned a base calorie value and scaled using the relative portion size:
+
+```
+portion_scale = 0.5 + size_score_norm
+estimated_calories = base_calories × portion_scale
+```
+### Example Calorie Reference
+
+The system uses a reference dictionary mapping food labels to base calorie values:
 
 ```python
-food_db = {
-    "rice": {"density": 0.9, "cal_per_g": 1.3},
-    "chicken": {"density": 1.1, "cal_per_g": 2.4},
+calorie_reference = {
+    "rice": 206,
+    "bread": 80,
+    "tomato": 22,
+    "chicken duck": 239,
+    "pizza": 285,
+    ...
 }
 ```
 
-> ⚠️ Current implementation uses relative scaling. Future work will improve **true physical calibration**.
-
+Unknown items are assigned a default calorie value.
 ---
+
+### ⚠️ Important
+
+This approach provides **relative calorie estimates**, not exact real-world measurements.
+
+True physical modelling (volume, density, calibrated depth) is planned as future work.
+```
 
 ## 📊 Current Results
 
