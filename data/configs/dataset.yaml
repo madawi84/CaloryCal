@@ -1,0 +1,13 @@
+path: ../data
+
+train: images/train
+val: images/val
+
+names:
+  0: rice
+  1: bread
+  2: tomato
+  3: chicken duck
+  4: pasta
+  5: pizza
+  6: salad
