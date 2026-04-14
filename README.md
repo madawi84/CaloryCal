@@ -92,7 +92,8 @@ estimated_calories = base_calories × portion_scale
 
 The system uses a reference dictionary mapping food labels to base calorie values:
 
-```python
+```
+python
 calorie_reference = {
     "rice": 206,
     "bread": 80,
@@ -111,7 +112,7 @@ Unknown items are assigned a default calorie value.
 This approach provides **relative calorie estimates**, not exact real-world measurements.
 
 True physical modelling (volume, density, calibrated depth) is planned as future work.
-```
+
 
 ## 📊 Current Results
 
